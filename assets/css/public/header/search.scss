@@ -6,11 +6,13 @@
       align-items: start;
       box-sizing: border-box;
       .left {
-        width: 280px;
+        width: 400px;
         padding-top: 15px;
+        text-align: center;
         img {
           width: 126px;
           height: 46px;
+
         }
       }
       .center {
@@ -154,6 +156,8 @@
         padding-top: 15px;
 
         .security {
+          display: flex;
+          justify-content: center;
           li {
             display: inline-block;
             text-align: center;
