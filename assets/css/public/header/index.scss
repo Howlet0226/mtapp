@@ -1,5 +1,8 @@
 @import "./topbar.scss";
 @import "./search.scss";
+*{
+  text-decoration: none;
+}
 .m-header{
   @at-root .layout-default{
     .el-header{
