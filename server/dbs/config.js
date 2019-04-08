@@ -17,11 +17,11 @@ export default {
     },
     // 这里填你的邮箱
     get user() {
-      return 'xxxx@qq.com';
+      return '825111441@qq.com';
     },
     // 这里就填授权码
     get pass() {
-      return '';
+      return 'ggpiazsfodhqbdcj';
     },
     // 生成的验证码
     get code() {
