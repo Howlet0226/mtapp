@@ -1,6 +1,6 @@
 export default {
   // 对于数据库地址的配置，MongoDB默认的端口为27017，
-  dbs: 'mongodb://127.0.0.1:27017',
+  dbs: 'mongodb://127.0.0.1:27017/mtappdb',
   // 对于redis的配置（用来存储session的）
   redis: {
     get host() {
