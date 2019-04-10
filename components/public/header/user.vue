@@ -1,25 +1,36 @@
 <template>
   <div class="m-user">
-    <div v-if="user">
-      欢迎您，
-      <span class="username">{{ user }}</span>
-      <nuxt-link to="/exit">退出</nuxt-link>
-    </div>
-    <div v-else>
-      <nuxt-link to="/login" class="login">立即登录</nuxt-link>
-    <nuxt-link to="/register" class="register">注册</nuxt-link>
-    </div>
+    <template v-if="user">
+      欢迎您，<span class="username">{{ user }}</span>
+      [<nuxt-link to="/exit">退出</nuxt-link>]
+    </template>
+    <template v-else>
+      <nuxt-link
+        to="/login"
+        class="login">立即登录</nuxt-link>
+      <nuxt-link
+        class="register"
+        to="/register">注册</nuxt-link>
+    </template>
   </div>
 </template>
 
 <script>
 export default {
-    data(){
-        return{
-            user:''
-        }
+  data(){
+    return {
+      user:''
     }
-};
+  },
+  async mounted(){
+    // mouted表示在界面渲染完成以后执行
+    const {status,data:{user}} = await this.$axios.get('/users/getUser')
+    if(status===200){
+      this.user=user
+    }
+  }
+}
 </script>
-<style scoped>
+
+<style lang="css">
 </style>

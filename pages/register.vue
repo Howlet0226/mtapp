@@ -116,18 +116,18 @@ import CryptoJS from 'crypto-js'
                   message: '确认密码',
                   trigger: 'blur'
                 },
-                //  {
-                //   validator: (rule, value, callback) => {
-                //     if (value === '') {
-                //       callback(new Error('请再次输入密码'))
-                //     } else if (value !== this.ruleForm.pwd) {
-                //       callback(new Error('两次输入密码不一致'))
-                //     } else {
-                //       callback()
-                //     }
-                //   },
-                //   trigger: 'blur'
-                // }
+                 {
+                  validator: (rule, value, callback) => {
+                    if (value === '') {
+                      callback(new Error('请再次输入密码'))
+                    } else if (value !== this.ruleForm.pwd) {
+                      callback(new Error('两次输入密码不一致'))
+                    } else {
+                      callback()
+                    }
+                  },
+                  trigger: 'blur'
+                }
               ]
               }
             }
@@ -146,7 +146,7 @@ import CryptoJS from 'crypto-js'
               if (self.timerid) {
                 return false
               }
-              // 当表单验证失败的时候，vaild里面就会有值，这是element封装好的方法
+              // 当表单在前端验证失败的时候，vaild里面就会有值，这是element封装好的方法
               this.$refs['ruleForm'].validateField('name', (valid) => {
                 namePass = valid
               })
@@ -160,7 +160,7 @@ import CryptoJS from 'crypto-js'
               this.$refs['ruleForm'].validateField('email', (valid) => {
                 emailPass = valid
               })
-              // 如果两个都成功了
+              // 如果两个都成功了，说明是合法的方式，可以发送给后台
               if (!namePass && !emailPass) {
                 // 这里没有引用axios模块,为什么可以使用?因为nuxt框架帮我们在配置文件里面 modules选项里配置了
                 self.$axios.post('/users/verify', {
@@ -191,33 +191,36 @@ import CryptoJS from 'crypto-js'
               }
             },
             register: function () {
-              // let self = this;
-              // this.$refs['ruleForm'].validate((valid) => {
-              //   if (valid) {
-              //     self.$axios.post('/users/signup', {
-              //       username: window.encodeURIComponent(self.ruleForm.name),
-              //       password: CryptoJS.MD5(self.ruleForm.pwd).toString(),
-              //       email: self.ruleForm.email,
-              //       code: self.ruleForm.code
-              //     }).then(({
-              //       status,
-              //       data
-              //     }) => {
-              //       if (status === 200) {
-              //         if (data && data.code === 0) {
-              //           location.href = '/login'
-              //         } else {
-              //           self.error = data.msg
-              //         }
-              //       } else {
-              //         self.error = `服务器出错，错误码:${status}`
-              //       }
-              //       setTimeout(function () {
-              //         self.error = ''
-              //       }, 1500)
-              //     })
-              //   }
-              // })
+              let self = this;
+              // 验证表单中所填值是否符合elementUI设定的规则 ？？？
+              this.$refs['ruleForm'].validate((valid) => {
+                // console.log(valid)
+                if (valid) {
+                  self.$axios.post('/users/signup', {
+                    username: encodeURIComponent(self.ruleForm.name),
+                    password: CryptoJS.MD5(self.ruleForm.pwd).toString(),
+                    email: self.ruleForm.email,
+                    code: self.ruleForm.code
+                  }).then(({
+                    status,
+                    data
+                  }) => {
+                    if (status === 200) {
+                      if (data && data.code === 0) {
+                        alert('注册成功')
+                        location.href = '/login'
+                      } else {
+                        self.error = data.msg
+                      }
+                    } else {
+                      self.error = `服务器出错，错误码:${status}`
+                    }
+                    setTimeout(function () {
+                      self.error = ''
+                    }, 1500)
+                  })
+                }
+              })
             }
           }
         }

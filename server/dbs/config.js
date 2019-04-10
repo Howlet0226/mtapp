@@ -35,7 +35,7 @@ export default {
     // 验证码的生命周期
     get expire() {
       return () => {
-        return new Date().getTime() + 60 * 60 * 1000;
+        return new Date().getTime() +  30*60 * 1000;
       };
     },
   },

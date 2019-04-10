@@ -58,27 +58,33 @@ router.post("/signup", async ctx => {
   }
 
   let nuser = await User.create({ username, password, email });
-
-  if (nuser) {
-    let res = await axios.post("/user/signin", { username, password });
-    if (res.data && res.data.code === 0) {
-      ctx.body = {
-        code: 0,
-        msg: "注册成功",
-        user: res.data.user
-      };
-    } else {
-      ctx.body = {
-        code: -1,
-        msg: "出现错误，请重新注册"
-      };
-    }
-  } else {
-    ctx.body = {
-      code: -1,
-      msg: "注册失败"
-    };
-  }
+  ctx.body = {
+    code: 0,
+    msg: "注册成功"
+  };
+  // if (nuser) {
+  //   // 像登录发送数据，并获取返回的结果,达到确认注册成功的作用
+  //   let res = await axios.post('/users/signin', {username, password})
+  //   // 如果有数据且code的值为0
+  //   if (res.data && res.data.code === 0) {
+  //     ctx.body = {
+  //       code: 0,
+  //       msg: '注册成功',
+  //       user: res.data.user
+  //     }
+  //   } else {
+  //     ctx.body = {
+  //       code: -1,
+  //       msg: 'error'
+  //     }
+  //   }
+  //   // 如果注册失败
+  // } else {
+  //   ctx.body = {
+  //     code: -1,
+  //     msg: '注册失败'
+  //   }
+  // }
 });
 
 router.post("/signin", async (ctx, next) => {
@@ -95,92 +101,99 @@ router.post("/signin", async (ctx, next) => {
           msg: "登录成功",
           user: user
         };
-    return ctx.login(user)
-      }else {
+        ctx.login(user);
+        return 
+      } else {
         ctx.body = {
-            code: 1,
-            msg: info
-
-          }  
+          code: 1,
+          msg: info
+        };
       }
     }
-  })(ctx,next)
-})
+  })(ctx, next);
+});
 
-router.post('/verify', async ctx =>{
-    let username = ctx.request.body.username
-    const saveExpire = await store.hget(`nodemail:${username}`,'expire')
-    if(saveExpire && new Date().getTime() - saveExpire <0){
-        ctx.body={
-            code:-1,
-            msg:'验证请求过于频繁，一分钟内一次'
-        }
-        return false
+router.post("/verify", async ctx => {
+  let username = ctx.request.body.username;
+  const saveExpire = await store.hget(`nodemail:${username}`, "expire");
+  if (saveExpire && new Date().getTime() - saveExpire < 0) {
+    ctx.body = {
+      code: -1,
+      msg: "验证请求过于频繁，一分钟内一次"
+    };
+    return false;
+  }
+
+  let transporter = nodeMailer.createTransport({
+    service: "qq",
+    auth: {
+      user: email.smtp.user,
+      pass: email.smtp.pass
     }
+  });
 
-    let transporter = nodeMailer.createTransport({
-        service:'qq',
-        auth:{
-            user: email.smtp.user,
-            pass:email.smtp.pass
-        }
-    })
+  let ko = {
+    code: email.smtp.code(),
+    expire: email.smtp.expire(),
+    email: ctx.request.body.email,
+    user: ctx.request.body.username
+  };
 
-
-    let ko = {
-        code:email.smtp.code(),
-        expire:email.smtp.expire(),
-        email:ctx.request.body.email,
-        user: ctx.request.body.username
+  let mailOptions = {
+    from: `认证邮件<${email.smtp.user}>`,
+    to: ko.email,
+    subject: "howlet美团网注册码",
+    html: `您在howlet美团网注册码中注册，您的邀请码是${ko.code}`
+  };
+  await transporter.sendMail(mailOptions, (err, info) => {
+    if (err) {
+      return console.log(err);
+    } else {
+      store.hmset(
+        `nodemail:${ko.user}`,
+        "code",
+        ko.code,
+        "expire",
+        ko.expire,
+        "email",
+        ko.email
+      );
     }
+  });
+  ctx.body = {
+    code: 0,
+    msg: "验证码已发送"
+  };
+});
 
-    let mailOptions = {
-        from:`认证邮件<${email.smtp.user}>`,
-        to:ko.email,
-        subject:'howlet美团网注册码',
-        html:`您在howlet美团网注册码中注册，您的邀请码是${ko.code}`
-    }
-    await transporter.sendMail(mailOptions,(err,info)=>{
-        if(err){
-            return console.log(err);
-            
-        }else{
-            store.hmset(`nodemail:${ko.user}`,'code',ko.code,'expire',ko.expire,'email',ko.email)
-        }
-    })
-    ctx.body={
-        code:0,
-        msg:'验证码已发送'
-    }
-})
+router.get("/exit", async ctx => {
+  // console.log(ctx.session);
+  await ctx.logout();
+  // console.log(ctx.session);
+  if (!ctx.isAuthenticated()) {
+    ctx.body = {
+      code: 0
+    };
+  } else {
+    ctx.body = {
+      code: -1
+    };
+  }
+});
 
+router.get("/getUser", async ctx => {
+  if (ctx.isAuthenticated()) {
+    const { username, email } = ctx.session.passport.user;
+    ctx.body = {
+      user: username,
+      email
+    };
+  } else {
+    ctx.body = {
+      user: "",
+      email: ""
+    };
+  }
+});
 
-router.get('/exit', async ctx =>{
-    await ctx.logout()
-    if(!ctx.isAuthenticated()){
-        ctx.body={
-            code:0
-        }
-    }else{
-        ctx.body={
-            code:-1
-        }
-    }
-})
-
-router.get('/getUser', async ctx =>{
-    if(ctx.isAuthenticated()){
-        const {username,email} = ctx.session.passport.user
-        ctx.body={
-            user:username,
-            email
-        }
-    }else{
-        ctx.body={
-            user:'',
-            email:''
-        }
-    }
-})
-
-export default router
+export default router;

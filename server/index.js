@@ -12,6 +12,7 @@ import json from 'koa-json'
 import dbConfig from './dbs/config'
 import passport from './interface/utils/passport'
 import users from './interface/users'
+import geo from './interface/geo'
 
 const app = new Koa()
 
@@ -30,7 +31,7 @@ async function start() {
 
 
   //  设置秘钥
-app.keys = ['mt', 'keyskeys']
+app.keys = ['zxczxczxcas','asdwerwqrwer']
 app.proxy = true
 // key为设置存在cookie中的名字，prefix为session值添加一个前缀，store表示连接redis
 app.use(session({key: 'mt', prefix: 'mt:uid', store: new Redis()}))
@@ -46,7 +47,7 @@ mongoose.connect(dbConfig.dbs,{
 })
 // 设置检验模块初始化
 app.use(passport.initialize())
-// 此设置就会让ctx里面有session属性？？？？
+// 此设置就会让ctx里面的session属性有passport属性
 app.use(passport.session())
 
   // Build in development
@@ -58,8 +59,9 @@ app.use(passport.session())
   }
   // allowedMethods的作用是当次路由所有的中间件执行完成以后，如果ctx.status为空或者为404，就返回一个header头，里面有丰富的response对象。
 app.use(users.routes()).use(users.allowedMethods())
-
+app.use(geo.routes()).use(geo.allowedMethods())
   app.use(ctx => {
+    // console.log(ctx.session)
     ctx.status = 200
     ctx.respond = false // Bypass Koa's built-in response handling
     ctx.req.ctx = ctx // This might be useful later on, e.g. in nuxtServerInit or with nuxt-stash
