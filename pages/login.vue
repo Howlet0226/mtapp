@@ -21,12 +21,12 @@
           <span>账号登录</span>
         </p>
         <el-input v-model="username" prefix-icon="profile"/>
-        <el-input v-model="password" prefix-icon="password" type="password"/>
+        <el-input v-model="password" prefix-icon="password" type="password" @keyup.enter.native = "login" />
         <div class="foot">
           <el-checkbox v-model="checked">7天内自动登录</el-checkbox>
           <b>忘记密码?</b>
         </div>
-        <el-button class="btn-login" type="success" size="mini" @click="login">登录</el-button>
+        <el-button class="btn-login" type="success" size="mini"  @click="login">登录</el-button>
       </div>
     </div>
   </div>
@@ -46,6 +46,7 @@ export default {
   },
   methods: {
     login: function() {
+      console.log(123);
       let self = this;
       self.$axios
         .post("/users/signin", {

@@ -13,6 +13,7 @@ import dbConfig from './dbs/config'
 import passport from './interface/utils/passport'
 import users from './interface/users'
 import geo from './interface/geo'
+import search from './interface/search'
 
 const app = new Koa()
 
@@ -60,6 +61,7 @@ app.use(passport.session())
   // allowedMethods的作用是当次路由所有的中间件执行完成以后，如果ctx.status为空或者为404，就返回一个header头，里面有丰富的response对象。
 app.use(users.routes()).use(users.allowedMethods())
 app.use(geo.routes()).use(geo.allowedMethods())
+app.use(search.routes()).use(search.allowedMethods())
   app.use(ctx => {
     // console.log(ctx.session)
     ctx.status = 200

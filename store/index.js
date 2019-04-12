@@ -1,11 +1,10 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import geo from "./module/geo";
-import home from './module/home';
-
+import home from "./module/home";
 Vue.use(Vuex);
 // nuxt里面规定，这里必须返回一个函数，所以要这样写
-const store = () =>{
+const store = () => {
   return new Vuex.Store({
     // 引用vuex的子模块
     modules: {
@@ -29,13 +28,25 @@ const store = () =>{
         commit(
           "geo/setPosition",
           status === 200 ? { city, province } : { city: "", province: "" }
-        )
-        const {status:status2,data:{menu}} = await req.$axios.get('geo/menu');
-        commit('home/setMenu',status2 === 200 ? menu : []);
+        );
+        const {
+          status: status2,
+          data: { menu }
+        } = await req.$axios.get("/geo/menu");
+        commit("home/setMenu", status2 === 200 ? menu : []);
+
+        const {
+          status: status3,
+          data: { result }
+        } = await req.$axios.get("/search/hotplace", {
+          params: {
+            city: "石景山区"
+          }
+        });
+        commit("home/setHotPlace", status3 === 200 ? result : []);
       }
     }
-  })
-}
-
+  });
+};
 
 export default store;

@@ -9,8 +9,8 @@ router.get('/getPosition', async ctx=>{
     let{status,data:{province,city}} = {
         status:200,
         data:{
-            province:'重庆市',
-            city:'重庆市'
+            province:'三亚市',
+            city:'三亚市'
         }
     }
     if(status === 200){
