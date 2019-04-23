@@ -14,7 +14,8 @@ import passport from './interface/utils/passport'
 import users from './interface/users'
 import geo from './interface/geo'
 import search from './interface/search'
-
+import categroy from './interface/categroy'
+import cart from './interface/cart'
 const app = new Koa()
 
 // Import and Set Nuxt.js options
@@ -62,6 +63,8 @@ app.use(passport.session())
 app.use(users.routes()).use(users.allowedMethods())
 app.use(geo.routes()).use(geo.allowedMethods())
 app.use(search.routes()).use(search.allowedMethods())
+app.use(categroy.routes()).use(categroy.allowedMethods())
+app.use(cart.routes()).use(cart.allowedMethods())
   app.use(ctx => {
     // console.log(ctx.session)
     ctx.status = 200
